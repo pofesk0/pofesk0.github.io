@@ -1,0 +1,91 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<title>Свобода установки приложений</title>
+<style>
+  html, body {
+    height: 100%;
+    margin: 0;
+    padding: 0;
+    font-family: Arial, sans-serif;
+    background-color: #f9f9f9;
+    box-sizing: border-box;
+  }
+
+  body {
+    display: flex;
+    justify-content: flex-start;
+    align-items: center;
+    padding: 0.5vh 1vw;   /* уменьшенные верхний и нижний отступы и боковые */
+  }
+
+  .content {
+    width: 98%;       /* почти вся ширина */
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+  }
+
+  p {
+    margin: 0 0 0.5em 0;  /* убрали отступ перед кнопкой, оставили только после текста */
+    white-space: pre-line;
+    font-size: calc(12px + 0.9vw); /* адаптивный размер шрифта */
+  }
+
+  button {
+    width: 98%;  /* почти вся ширина текста */
+    padding: 18px 0;  /* вертикальный размер */
+    font-size: calc(14px + 0.8vw); /* адаптивный размер текста кнопки */
+    border: none;
+    border-radius: 8px;
+    background-color: #007BFF;
+    color: white;
+    cursor: pointer;
+    display: block;
+    margin: 0 auto 0.5em auto;  /* только отступ после кнопки */
+    box-sizing: border-box;
+  }
+
+  button:hover {
+    background-color: #0056b3;
+  }
+</style>
+</head>
+<body>
+
+<div class="content">
+  <p>Это сайт-инструкция, который поможет вам вернуть свободу установки приложений.
+
+С конца 2026 года Google намерены блокировать установку приложений от анонимных (не передавших личные данные Google) разработчиков даже вне 'Google Play'. Чтобы дальше ставить любые приложения и иметь свободу, нужно всего лишь отключить 'Сервисы Google Play' и просто 'Google Play' (Play Маркет).
+
+Для этого откройте настройки приложений, затем найдите приложения 'Сервисы Google Play', а также просто 'Google Play' (Play Маркет) и отключите их.
+  </p>
+
+  <button id="openApps">Открыть настройки приложений</button>
+
+  <p>
+Если не получается отключить, вероятно, администраторы устройства блокируют это. В таком случае зайдите в настройки безопасности, затем дополнительные настройки, после чего найдите пункт администраторы и отключите уже их.
+  </p>
+
+  <button id="openSecurity">Открыть настройки безопасности</button>
+
+  <p>
+После отключения администраторов попробуйте снова отключить 'Сервисы Google Play' и просто 'Google Play' (Play Маркет), если в первый раз у вас не получилось.
+
+Если вы хотите снова пользоваться сервисами Google Play и Play Маркет, просто включите их обратно.
+  </p>
+</div>
+
+<script>
+document.getElementById('openApps').addEventListener('click', function () {
+  window.location.href = 'intent:#Intent;action=android.settings.APPLICATION_SETTINGS;end';
+});
+
+document.getElementById('openSecurity').addEventListener('click', function () {
+  window.location.href = 'intent:#Intent;action=android.settings.SECURITY_SETTINGS;end';
+});
+</script>
+
+</body>
+</html>
