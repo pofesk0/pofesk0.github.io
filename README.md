@@ -1,3 +1,9 @@
-https://pofesk0.github.io
+https://pofesk0.github.io/index.html
 
 Это сайт инструкция который вероятно поможет обойти глупый запрет Google на установку приложений он анонимных разработчиков, который они хотят ввести с конца 2026 года.
+
+++
+
+https://pofesk0.github.io/image-to-drawable-generator.html
+
+Это простой генератор лого для Android приложений на основе любых изображений.
