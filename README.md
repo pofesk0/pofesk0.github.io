@@ -7,3 +7,9 @@ https://pofesk0.github.io/index.html
 https://pofesk0.github.io/image-to-drawable-generator.html
 
 Это простой генератор лого для Android приложений на основе любых изображений.
+
+++
+
+https://pofesk0.github.io/encrypted-page-generator.html
+
+Это генератор защищенных от ботов текстовых веб страниц. Содержимое шифруется по капче. А код хешируется вместе с текстом.
