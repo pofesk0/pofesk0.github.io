@@ -1,3 +1,11 @@
+Projects (проекты):
+
+https://github.com/pofesk0/lastcodeduresskeyboard/ - DuressKeyboard Application (приложение DuressKeyboard).
+
+++
+
+WebPages:
+
 https://pofesk0.github.io/index.html
 
 Это сайт инструкция который вероятно поможет обойти глупый запрет Google на установку приложений он анонимных разработчиков, который они хотят ввести с конца 2026 года.
