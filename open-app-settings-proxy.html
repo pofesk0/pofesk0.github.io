@@ -1,0 +1,74 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<style>
+  html, body {
+    height: 100%;
+    margin: 0;
+    padding: 0;
+    font-family: Arial, sans-serif;
+    background-color: #f9f9f9;
+  }
+  body {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 10px;
+  }
+  .modal-box {
+    display: none;
+    background: white;
+    padding: 30px 24px;
+    border-radius: 16px;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+    max-width: 400px;
+    width: 100%;
+    text-align: center;
+    box-sizing: border-box;
+  }
+  .modal-text {
+    font-size: 18px;
+    color: #000;
+    margin: 0 0 24px 0;
+    line-height: 1.5;
+  }
+  .modal-button {
+    width: 100%;
+    padding: 16px 0;
+    font-size: 18px;
+    font-weight: bold;
+    border: none;
+    border-radius: 8px;
+    background-color: #007BFF;
+    color: white;
+    cursor: pointer;
+  }
+</style>
+</head>
+<body>
+
+<div class="modal-box" id="modalBox">
+  <p class="modal-text" id="modalText"></p>
+  <button class="modal-button" id="modalBtn"></button>
+</div>
+
+<script>
+const intentUri = 'intent:#Intent;action=android.settings.APPLICATION_SETTINGS;end';
+const isRussian = (navigator.language || navigator.userLanguage).toLowerCase().startsWith('ru');
+
+window.location.href = intentUri;
+
+setTimeout(() => {
+  document.getElementById('modalText').innerText = isRussian ? "Открыть настройки приложений?" : "Open Apps Settings?";
+  document.getElementById('modalBtn').innerText = isRussian ? "Продолжить" : "Continue";
+  document.getElementById('modalBox').style.display = 'block';
+}, 300);
+
+document.getElementById('modalBtn').addEventListener('click', function () {
+  window.location.href = intentUri;
+});
+</script>
+</body>
+</html>
