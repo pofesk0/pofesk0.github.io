@@ -1,6 +1,7 @@
 Projects (проекты):
 
-https://github.com/pofesk0/DuressKeyboard/- DuressKeyboard Application (приложение DuressKeyboard).
+https://github.com/pofesk0/DuressKeyboard/
+- DuressKeyboard Application (приложение DuressKeyboard).
 https://github.com/pofesk0/lastcodeduresskeyboard/ DuressKeyboard Application, mirror for F-droid (приложение DuressKeyboard, зеркало для F-droid).
 
 ++
