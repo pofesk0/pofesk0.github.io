@@ -10,7 +10,7 @@ https://github.com/pofesk0/DuressKeyboardLite/ - DuressKeyboardLite Application 
 
 ++
 
-https://github.com/pofesk0/lastcodefakelauncher/ - FakeLauncher Application (приложение FakeLauncher).
+https://github.com/pofesk0/FakeLauncher/ - FakeLauncher Application (приложение FakeLauncher).
 
 WebPages:
 
