@@ -2,7 +2,7 @@
 <html lang="ru">
 <head>
 <meta charset="UTF-8">
-<title>Android Launcher Icon Generator</title>
+<title>Android Launcher Logo Generator</title>
 
 <style>
 body {
@@ -20,10 +20,9 @@ body {
 <body>
 
 <input type="file" id="file" accept="image/*">
-<button onclick="gen()">Generate ZIP</button>
+<button onclick="gen()">Generate logo</button>
 
 <script>
-/* ===== CRC32 ===== */
 function crc32(buf) {
   let c = ~0;
   for (let i = 0; i < buf.length; i++) {
@@ -34,7 +33,6 @@ function crc32(buf) {
   return ~c >>> 0;
 }
 
-/* ===== RAW ZIP (STORE) ===== */
 function zip(files) {
   const chunks = [];
   const central = [];
@@ -53,7 +51,7 @@ function zip(files) {
     view.setUint32(0, 0x04034b50, true);
     view.setUint16(4, 20, true);
     view.setUint16(6, 0, true);
-    view.setUint16(8, 0, true); // STORE
+    view.setUint16(8, 0, true);
     view.setUint32(10, 0, true);
     view.setUint32(14, crc, true);
     view.setUint32(18, data.length, true);
@@ -101,7 +99,6 @@ function zip(files) {
   return new Blob([...chunks, ...central, end], { type: 'application/zip' });
 }
 
-/* ===== ICON LOGIC ===== */
 const sizes = {
   mdpi: 48,
   hdpi: 72,
@@ -124,7 +121,7 @@ function drawFit(img, size) {
 
 function gen() {
   const f = file.files[0];
-  if (!f) return alert('Выбери файл');
+  if (!f) return alert('Select file please');
 
   const reader = new FileReader();
   reader.onload = () => {
