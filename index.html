@@ -1,0 +1,91 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<title>Советы по установке приложений</title>
+<style>
+  html, body {
+    height: 100%;
+    margin: 0;
+    padding: 0;
+    font-family: Arial, sans-serif;
+    background-color: #f9f9f9;
+    box-sizing: border-box;
+  }
+
+  body {
+    display: flex;
+    justify-content: flex-start;
+    align-items: center;
+    padding: 0.5vh 1vw;
+  }
+
+  .content {
+    width: 98%;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+  }
+
+  p {
+    margin: 0 0 0.5em 0;
+    white-space: pre-line;
+    font-size: calc(12px + 0.9vw);
+  }
+
+  button {
+    width: 98%;
+    padding: 18px 0;
+    font-size: calc(14px + 0.8vw);
+    border: none;
+    border-radius: 8px;
+    background-color: #007BFF;
+    color: white;
+    cursor: pointer;
+    display: block;
+    margin: 0 auto 0.5em auto;
+    box-sizing: border-box;
+  }
+
+  button:hover {
+    background-color: #0056b3;
+  }
+</style>
+</head>
+<body>
+
+<div class="content">
+  <p>Советы по установке приложений в условиях ограничений со стороны Google.
+
+Google заявляли что с конца 2026 года они хотят блокировать установку приложений от анонимных (не передавших личные данные Google и не заплативших им) разработчиков даже вне 'Google Play'. Чтобы дальше ставить любые приложения, можно попробовать отключить приложения 'Сервисы Google Play' и сам 'Google Play' (Play Маркет), ведь я предполагаю что блокировка может осуществяться через них. Надеюсь, что это поможет.
+
+Для этого откройте настройки приложений, затем найдите приложения 'Сервисы Google Play', а также просто 'Google Play' (Play Маркет) и отключите их.
+  </p>
+
+  <button id="openApps">Открыть настройки приложений</button>
+
+  <p>
+    Если не получается отключить, вероятно роль администратора у одного из Google сервисов блокирует кнопку отключения. В таком случае зайдите в настройки безопасности, затем дополнительные настройки, после чего найдите пункт администраторы и отключите администратора 'найти устройство', либо 'поиск устройства' или 'find my device'. Если это не помогло, то отключите вообще всех администраторов связанных с системными (предустановленными) приложениями.
+  </p>
+
+  <button id="openSecurity">Открыть настройки безопасности</button>
+
+  <p>
+После отключения администраторов попробуйте снова отключить 'Сервисы Google Play' и просто 'Google Play' (Play Маркет), если в первый раз у вас не получилось.
+
+Если вы хотите снова пользоваться сервисами Google Play, просто включите их обратно после установки нужных приложений.
+  </p>
+</div>
+
+<script>
+document.getElementById('openApps').addEventListener('click', function () {
+  window.location.href = 'intent:#Intent;action=android.settings.APPLICATION_SETTINGS;end';
+});
+
+document.getElementById('openSecurity').addEventListener('click', function () {
+  window.location.href = 'intent:#Intent;action=android.settings.SECURITY_SETTINGS;end';
+});
+</script>
+
+</body>
+</html>
