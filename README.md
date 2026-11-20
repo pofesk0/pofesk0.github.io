@@ -38,8 +38,7 @@ https://pofesk0.github.io/EncryptedCapchaFilePageGenerator.html
 
 ++
 
-Генератор локальных html страниц с ЗАШИФРОВАННЫМИ ФАЙЛАМИ (для тех что хочет хранить страницу публично и отдельно хранить пароль)
-
+Генератор локальных html страниц с ЗАШИФРОВАННЫМИ ФАЙЛАМИ (для тех что хочет хранить страницу публично и отдельно хранить пароль):
 https://pofesk0.github.io/EncryptedPasswordFilePageGenerator.html
 
 ++
