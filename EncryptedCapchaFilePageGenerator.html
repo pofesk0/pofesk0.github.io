@@ -1,0 +1,689 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Encrypted File Generator</title>
+
+<style>
+body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    margin: 0;
+    padding: 15px;
+    background: #f4f7f9;
+    color: #333;
+}
+
+.container {
+    max-width: 600px;
+    margin: 30px auto;
+    background: white;
+    padding: 20px;
+    border-radius: 12px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+}
+
+h2 { font-size: 1.4rem; }
+
+.file-input {
+    width: 100%;
+    padding: 20px;
+    border: 2px dashed #ccc;
+    border-radius: 8px;
+    box-sizing: border-box;
+    margin: 10px 0;
+    background: #fafafa;
+}
+
+.main-btn {
+    width: 100%;
+    padding: 15px;
+    cursor: pointer;
+    background: #007bff;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-size: 16px;
+    font-weight: bold;
+}
+
+.main-btn:disabled {
+    opacity: .5;
+    cursor: wait;
+}
+
+#output {
+    margin-top: 25px;
+    display: none;
+}
+
+.code-display {
+    width: 100%;
+    height: 200px;
+    margin-top: 15px;
+    padding: 10px;
+    box-sizing: border-box;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    font-size: 12px;
+    font-family: monospace;
+}
+
+.btn-row {
+    display: flex;
+    gap: 10px;
+    margin-top: 10px;
+}
+
+.btn-row button {
+    flex: 1;
+    padding: 12px;
+    cursor: pointer;
+    border: none;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: bold;
+    color: white;
+}
+
+.download-btn { background: #28a745; }
+.copy-btn { background: #6c757d; }
+
+#status {
+    margin-top: 10px;
+    font-size: 14px;
+    color: #666;
+}
+</style>
+</head>
+
+<body>
+
+<div class="container">
+
+    <h2>1. Upload File</h2>
+
+    <input
+        type="file"
+        id="sourceFile"
+        class="file-input"
+    >
+
+    <p id="fileInfo"></p>
+
+    <button
+        class="main-btn"
+        id="generateBtn"
+        onclick="generatePage()"
+    >
+        Generate Protected Page
+    </button>
+
+    <p id="status"></p>
+
+    <div id="output">
+
+        <h3>2. Protected Page Ready</h3>
+
+        <div class="btn-row">
+
+            <button
+                class="download-btn"
+                onclick="downloadHtml()"
+            >
+                Download HTML
+            </button>
+
+            <button
+                class="copy-btn"
+                onclick="copyToClipboard()"
+            >
+                Copy Code
+            </button>
+
+        </div>
+
+        <textarea
+            id="htmlResult"
+            class="code-display"
+            readonly
+        ></textarea>
+
+    </div>
+
+</div>
+
+<script>
+
+const ITERATIONS = 200000;
+
+document.getElementById("sourceFile").addEventListener("change", function() {
+
+    const file = this.files[0];
+
+    document.getElementById("fileInfo").textContent =
+        file
+        ? "Selected: " + file.name +
+          " (" + (file.size / 1024 / 1024).toFixed(2) + " MB)"
+        : "";
+
+});
+
+function generateCode(length) {
+
+    const charset = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
+
+    const random = crypto.getRandomValues(
+        new Uint8Array(length)
+    );
+
+    return Array.from(random)
+        .map(b => charset[b % charset.length])
+        .join("");
+
+}
+
+function createCaptchaImage(text) {
+
+    const canvas = document.createElement("canvas");
+
+    canvas.width = 220;
+    canvas.height = 70;
+
+    const ctx = canvas.getContext("2d");
+
+    ctx.fillStyle = "#fff";
+    ctx.fillRect(0, 0, 220, 70);
+
+    for (let i = 0; i < 30; i++) {
+
+        ctx.strokeStyle =
+            `rgba(0,0,0,${Math.random() * 0.4})`;
+
+        ctx.beginPath();
+
+        ctx.moveTo(Math.random() * 220, Math.random() * 70);
+        ctx.lineTo(Math.random() * 220, Math.random() * 70);
+
+        ctx.stroke();
+
+    }
+
+    ctx.font = "bold 32px monospace";
+    ctx.fillStyle = "#111";
+    ctx.textAlign = "center";
+
+    ctx.fillText(text, 110, 46);
+
+    return canvas.toDataURL("image/png");
+
+}
+
+function bytesToBase64(bytes) {
+
+    let binary = "";
+    const chunkSize = 0x8000;
+
+    for (let i = 0; i < bytes.length; i += chunkSize) {
+
+        binary += String.fromCharCode(
+            ...bytes.subarray(i, i + chunkSize)
+        );
+
+    }
+
+    return btoa(binary);
+
+}
+
+function base64ToBytes(base64) {
+
+    const binary = atob(base64);
+
+    const bytes = new Uint8Array(binary.length);
+
+    for (let i = 0; i < binary.length; i++) {
+        bytes[i] = binary.charCodeAt(i);
+    }
+
+    return bytes;
+
+}
+
+async function deriveEncryptionKey(code, salt) {
+
+    const encoder = new TextEncoder();
+
+    const material = await crypto.subtle.importKey(
+        "raw",
+        encoder.encode(code),
+        "PBKDF2",
+        false,
+        ["deriveKey"]
+    );
+
+    return await crypto.subtle.deriveKey(
+        {
+            name: "PBKDF2",
+            salt: salt,
+            iterations: ITERATIONS,
+            hash: "SHA-256"
+        },
+        material,
+        {
+            name: "AES-GCM",
+            length: 256
+        },
+        false,
+        ["encrypt"]
+    );
+
+}
+
+async function generatePage() {
+
+    const file = document.getElementById("sourceFile").files[0];
+
+    if (!file) {
+        alert("Please select a file first");
+        return;
+    }
+
+    const button = document.getElementById("generateBtn");
+    const status = document.getElementById("status");
+
+    try {
+
+        button.disabled = true;
+        status.textContent = "Encrypting file...";
+
+        const fileBytes = new Uint8Array(
+            await file.arrayBuffer()
+        );
+
+        const captchaCode = generateCode(6);
+        const captchaImg = createCaptchaImage(captchaCode);
+
+        const salt = crypto.getRandomValues(
+            new Uint8Array(16)
+        );
+
+        const iv = crypto.getRandomValues(
+            new Uint8Array(12)
+        );
+
+        const key = await deriveEncryptionKey(
+            captchaCode,
+            salt
+        );
+
+        const encrypted = await crypto.subtle.encrypt(
+            {
+                name: "AES-GCM",
+                iv: iv
+            },
+            key,
+            fileBytes
+        );
+
+        const encryptedBase64 = bytesToBase64(
+            new Uint8Array(encrypted)
+        );
+
+        const ivBase64 = bytesToBase64(iv);
+        const saltBase64 = bytesToBase64(salt);
+
+        const fileName = JSON.stringify(file.name);
+        const fileType = JSON.stringify(
+            file.type || "application/octet-stream"
+        );
+
+        status.textContent = "Generating HTML page...";
+
+        const finalHtml = `<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+<meta charset="UTF-8">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Protected File Download</title>
+
+<style>
+
+* {
+    box-sizing: border-box;
+}
+
+body {
+    font-family: -apple-system, sans-serif;
+    background: #f0f2f5;
+    margin: 0;
+    display: flex;
+    justify-content: center;
+    min-height: 100vh;
+    padding: 20px;
+}
+
+.card {
+    background: white;
+    padding: 25px;
+    border-radius: 16px;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+    width: 100%;
+    max-width: 400px;
+    text-align: center;
+    margin-top: 20vh;
+    align-self: flex-start;
+}
+
+h3 {
+    margin-bottom: 20px;
+    color: #1c1e21;
+}
+
+img {
+    max-width: 100%;
+    border-radius: 8px;
+    border: 1px solid #ddd;
+    margin-bottom: 15px;
+}
+
+input {
+    width: 100%;
+    padding: 15px;
+    font-size: 18px;
+    border: 2px solid #eee;
+    border-radius: 10px;
+    text-align: center;
+    text-transform: uppercase;
+    outline: none;
+}
+
+input:focus {
+    border-color: #007bff;
+}
+
+button {
+    width: 100%;
+    padding: 15px;
+    margin-top: 15px;
+    background: #007bff;
+    color: white;
+    border: none;
+    border-radius: 10px;
+    font-size: 16px;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+button:disabled {
+    opacity: .5;
+}
+
+.error {
+    color: #dc3545;
+    font-size: 14px;
+    margin-top: 10px;
+    display: none;
+}
+
+#success {
+    display: none;
+    color: #28a745;
+    margin-top: 15px;
+}
+
+</style>
+
+</head>
+
+<body>
+
+<div class="card">
+
+    <div id="auth-zone">
+
+        <h3>Prove you're not a bot</h3>
+
+        <img src="${captchaImg}" alt="CAPTCHA">
+
+        <input
+            type="text"
+            id="keyCode"
+            placeholder="ENTER CODE"
+            maxlength="6"
+            autocomplete="off"
+            spellcheck="false"
+        >
+
+        <button id="downloadBtn" onclick="tryDecrypt()">
+            Unlock & Download File
+        </button>
+
+        <p id="error" class="error">
+            Incorrect code. Please try again.
+        </p>
+
+    </div>
+
+    <div id="success">
+        <h3>File decrypted!</h3>
+        Your download should start automatically.
+    </div>
+
+</div>
+
+<script>
+
+const eD = "${encryptedBase64}";
+const iD = "${ivBase64}";
+const sD = "${saltBase64}";
+
+const fileName = ${fileName};
+const fileType = ${fileType};
+
+const ITERATIONS = ${ITERATIONS};
+
+async function deriveKey(code, salt) {
+
+    const encoder = new TextEncoder();
+
+    const material = await crypto.subtle.importKey(
+        "raw",
+        encoder.encode(code),
+        "PBKDF2",
+        false,
+        ["deriveKey"]
+    );
+
+    return await crypto.subtle.deriveKey(
+        {
+            name: "PBKDF2",
+            salt: salt,
+            iterations: ITERATIONS,
+            hash: "SHA-256"
+        },
+        material,
+        {
+            name: "AES-GCM",
+            length: 256
+        },
+        false,
+        ["decrypt"]
+    );
+
+}
+
+function decodeBase64(value) {
+
+    const binary = atob(value);
+
+    const result = new Uint8Array(binary.length);
+
+    for (let i = 0; i < binary.length; i++) {
+        result[i] = binary.charCodeAt(i);
+    }
+
+    return result;
+
+}
+
+async function tryDecrypt() {
+
+    const input = document.getElementById("keyCode");
+    const error = document.getElementById("error");
+    const button = document.getElementById("downloadBtn");
+
+    const code = input.value.trim().toUpperCase();
+
+    error.style.display = "none";
+
+    if (code.length !== 6) {
+        return;
+    }
+
+    button.disabled = true;
+    button.textContent = "Decrypting...";
+
+    try {
+
+        const salt = decodeBase64(sD);
+        const iv = decodeBase64(iD);
+        const encrypted = decodeBase64(eD);
+
+        const key = await deriveKey(code, salt);
+
+        // Decrypt original file
+        const decrypted = await crypto.subtle.decrypt(
+            {
+                name: "AES-GCM",
+                iv: iv
+            },
+            key,
+            encrypted
+        );
+
+        // Reconstruct original file
+        const blob = new Blob(
+            [decrypted],
+            {
+                type: fileType
+            }
+        );
+
+        // Trigger file download
+        const url = URL.createObjectURL(blob);
+
+        const a = document.createElement("a");
+
+        a.href = url;
+        a.download = fileName;
+
+        document.body.appendChild(a);
+        a.click();
+        a.remove();
+
+        setTimeout(() => URL.revokeObjectURL(url), 60000);
+
+        document.getElementById("auth-zone").style.display = "none";
+        document.getElementById("success").style.display = "block";
+
+    } catch (e) {
+
+        error.style.display = "block";
+
+        button.disabled = false;
+        button.textContent = "Unlock & Download File";
+
+        input.value = "";
+
+    }
+
+}
+
+document.getElementById("keyCode").addEventListener(
+    "keydown",
+    function(e) {
+        if (e.key === "Enter") {
+            tryDecrypt();
+        }
+    }
+);
+
+<\/script>
+
+</body>
+</html>`;
+
+        document.getElementById("htmlResult").value = finalHtml;
+
+        document.getElementById("output").style.display = "block";
+
+        status.textContent = "Successfully encrypted: " + file.name;
+
+    } catch (e) {
+
+        console.error(e);
+
+        alert("Error while encrypting file: " + e.message);
+
+        status.textContent = "Encryption failed.";
+
+    } finally {
+
+        button.disabled = false;
+
+    }
+
+}
+
+function downloadHtml() {
+
+    const html = document.getElementById("htmlResult").value;
+
+    const blob = new Blob(
+        [html],
+        { type: "text/html;charset=utf-8" }
+    );
+
+    const url = URL.createObjectURL(blob);
+
+    const a = document.createElement("a");
+
+    a.href = url;
+    a.download = "protected_file.html";
+
+    a.click();
+
+    setTimeout(() => URL.revokeObjectURL(url), 60000);
+
+}
+
+async function copyToClipboard() {
+
+    const text = document.getElementById("htmlResult").value;
+
+    try {
+
+        await navigator.clipboard.writeText(text);
+
+    } catch (e) {
+
+        const textarea = document.getElementById("htmlResult");
+
+        textarea.select();
+        document.execCommand("copy");
+
+    }
+
+    alert("Code copied!");
+
+}
+
+</script>
+
+</body>
+</html>
